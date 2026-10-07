@@ -1,0 +1,21 @@
+Most common colors:
+RGB: (57, 181, 74), HEX: #39b54a, Count: 13484
+RGB: (127, 193, 94), HEX: #7fc15e, Count: 2161
+RGB: (47, 115, 111), HEX: #2f736f, Count: 1161
+RGB: (46, 114, 110), HEX: #2e726e, Count: 321
+RGB: (47, 114, 110), HEX: #2f726e, Count: 292
+RGB: (126, 193, 93), HEX: #7ec15d, Count: 265
+RGB: (46, 115, 111), HEX: #2e736f, Count: 250
+RGB: (47, 116, 112), HEX: #2f7470, Count: 240
+RGB: (128, 194, 94), HEX: #80c25e, Count: 239
+RGB: (0, 255, 0), HEX: #00ff00, Count: 207
+RGB: (47, 117, 113), HEX: #2f7571, Count: 193
+RGB: (128, 193, 94), HEX: #80c15e, Count: 185
+RGB: (128, 195, 94), HEX: #80c35e, Count: 162
+RGB: (126, 193, 94), HEX: #7ec15e, Count: 151
+RGB: (128, 191, 96), HEX: #80bf60, Count: 139
+RGB: (129, 196, 95), HEX: #81c45f, Count: 136
+RGB: (127, 194, 94), HEX: #7fc25e, Count: 126
+RGB: (127, 192, 94), HEX: #7fc05e, Count: 126
+RGB: (131, 199, 97), HEX: #83c761, Count: 95
+RGB: (128, 195, 95), HEX: #80c35f, Count: 86

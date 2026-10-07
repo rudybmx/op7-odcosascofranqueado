@@ -1,0 +1,2 @@
+Output:
+Python: Logo cropped successfully!

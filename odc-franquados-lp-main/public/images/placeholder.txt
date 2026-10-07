@@ -1,0 +1,3 @@
+This directory will contain local images for the landing page units.
+Please copy your unit background images here.
+Example: copy 'media__1783695024573.jpg' as 'hero-bg.jpg' in this folder.

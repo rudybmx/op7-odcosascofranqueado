@@ -1,0 +1,1060 @@
+import { useState, useEffect } from 'react';
+import { 
+  Sparkle, 
+  ShieldCheck, 
+  Pulse, 
+  Heart, 
+  Stethoscope, 
+  FirstAid, 
+  Phone, 
+  CaretDown, 
+  Star, 
+  CheckCircle,
+  CaretRight,
+  User,
+  Tooth,
+  Smiley,
+  Diamond,
+  Crown,
+  MagicWand,
+  Sun,
+  Drop
+} from '@phosphor-icons/react';
+import { getUnitFromUrl, UNITS_DATA, UnitData } from './data/unitConfig';
+import footerBg from './footer-bg.webp'; // Facade Background
+import logoFooter from './logo-footer.webp';
+
+function WhatsAppIcon({ className = "w-5 h-5" }: { className?: string }) {
+  return (
+    <svg 
+      className={className} 
+      viewBox="0 0 24 24" 
+      fill="currentColor" 
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.458 5.704 1.459h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+    </svg>
+  );
+}
+
+export default function App() {
+  const [unit, setUnit] = useState<UnitData>(UNITS_DATA.belem);
+  const [openFaqs, setOpenFaqs] = useState<number[]>([]);
+  const [scrolled, setScrolled] = useState(false);
+  
+  // Lead Form state
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [treatment, setTreatment] = useState('');
+  const [formSubmitted, setFormSubmitted] = useState(false);
+
+  // Footer multi-step Form state
+  const [footerName, setFooterName] = useState('');
+  const [footerPhone, setFooterPhone] = useState('');
+  const [footerTreatment, setFooterTreatment] = useState('Implantes Dentários');
+  const [footerFormStep, setFooterFormStep] = useState(1);
+  const [_footerFormSubmitted, setFooterFormSubmitted] = useState(false);
+
+  // Sync unit with URL parameters & scroll handler
+  useEffect(() => {
+    const resolvedUnit = getUnitFromUrl();
+    setUnit(resolvedUnit);
+    document.title = `ODONTOCOMPANY ${resolvedUnit.name.toUpperCase()} - Agende sua Avaliação`;
+
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Icon resolver helper
+  const renderIcon = (iconName: string) => {
+    switch (iconName) {
+      case 'Tooth':
+        return <Tooth className="w-6 h-6 text-brand-emerald" />;
+      case 'Smiley':
+        return <Smiley className="w-6 h-6 text-brand-emerald" />;
+      case 'Diamond':
+        return <Diamond className="w-6 h-6 text-brand-emerald" />;
+      case 'Crown':
+        return <Crown className="w-6 h-6 text-brand-emerald" />;
+      case 'MagicWand':
+        return <MagicWand className="w-6 h-6 text-brand-emerald" />;
+      case 'Sun':
+        return <Sun className="w-6 h-6 text-brand-emerald" />;
+      case 'Drop':
+        return <Drop className="w-6 h-6 text-brand-emerald" />;
+      case 'Sparkles':
+        return <Sparkle className="w-6 h-6 text-brand-emerald" />;
+      case 'ShieldCheck':
+        return <ShieldCheck className="w-6 h-6 text-brand-emerald" />;
+      case 'Activity':
+        return <Pulse className="w-6 h-6 text-brand-emerald" />;
+      case 'Heart':
+        return <Heart className="w-6 h-6 text-brand-emerald" />;
+      case 'Stethoscope':
+        return <Stethoscope className="w-6 h-6 text-brand-emerald" />;
+      case 'FirstAid':
+        return <FirstAid className="w-6 h-6 text-brand-emerald" />;
+      default:
+        return <Stethoscope className="w-6 h-6 text-brand-emerald" />;
+    }
+  };
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name || !phone) return;
+
+    // Construct WhatsApp redirect message
+    const formattedPhone = phone.replace(/\D/g, '');
+    const cleanTreatmentName = treatment ? ` de interesse em ${treatment}` : '';
+    const text = `Olá, meu nome é ${name}. Gostaria de agendar uma avaliação na ODONTOCOMPANY ${unit.name.toUpperCase()}${cleanTreatmentName}. Meu telefone é (${formattedPhone.substring(0, 2)}) ${formattedPhone.substring(2)}.`;
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=${unit.whatsapp}&text=${encodeURIComponent(text)}`;
+    
+    setFormSubmitted(true);
+    
+    // Redirect to WhatsApp
+    setTimeout(() => {
+      window.open(whatsappUrl, '_blank');
+      setFormSubmitted(false);
+      setName('');
+      setPhone('');
+      setTreatment('');
+    }, 1200);
+  };
+
+  const handleFooterFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+    if (!footerName || !footerPhone) return;
+
+    const formattedPhone = footerPhone.replace(/\D/g, '');
+    const text = `Olá, meu nome é ${footerName}. Solicitei uma pré-reserva de avaliação para ${footerTreatment} na unidade ${unit.name}. Meu telefone é (${formattedPhone.substring(0, 2)}) ${formattedPhone.substring(2)}.`;
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=${unit.whatsapp}&text=${encodeURIComponent(text)}`;
+    
+    setFooterFormSubmitted(true);
+    setFooterFormStep(3);
+
+    setTimeout(() => {
+      window.open(whatsappUrl, '_blank');
+    }, 1200);
+  };
+
+  const faqs = [
+    {
+      q: "Como funciona a primeira consulta de avaliação?",
+      a: "Na primeira consulta, nossos dentistas fazem uma análise completa da sua saúde bucal, tirando fotos e radiografias se necessário, para diagnosticar suas necessidades. Em seguida, elaboramos um plano de tratamento personalizado e apresentamos as melhores condições de pagamento."
+    },
+    {
+      q: "Quais são as formas de pagamento disponíveis?",
+      a: "Buscamos tornar o tratamento odontológico acessível a todos. Por isso, oferecemos diversas formas de pagamento: parcelamento no cartão de crédito, boleto bancário, PIX, e o nosso tradicional carnê facilitado da OdontoCompany."
+    },
+    {
+      q: "A OdontoCompany atende convênios odontológicos?",
+      a: `Nossos tratamentos são particulares, porém com condições extremamente facilitadas e valores acessíveis. Dependendo da unidade ${unit.name}, oferecemos também parcerias corporativas e convênios parceiros. Entre em contato pelo WhatsApp para verificar convênios específicos da nossa unidade.`
+    },
+    {
+      q: "Onde fica a clínica e como faço para chegar?",
+      a: `Nossa clínica está localizada na ${unit.address.street}, nº ${unit.address.number}, no bairro ${unit.address.neighborhood} em ${unit.address.city}/${unit.address.state}. Temos fácil acesso e pontos de referência locais para facilitar sua chegada.`
+    }
+  ];
+
+  return (
+    <div className="flex flex-col min-h-screen bg-neutral-base font-sans antialiased text-neutral-dark selection:bg-brand-lime selection:text-brand-green-dark">
+
+      {/* Navigation Header */}
+      <div className={`fixed left-0 right-0 z-50 transition-all duration-500 flex justify-center px-4 ${scrolled ? 'top-2' : 'top-6'}`}>
+        <header className={`w-full transition-all duration-500 rounded-2xl md:rounded-full border border-white/20 shadow-lg transform ${
+          scrolled
+            ? 'max-w-5xl bg-gradient-to-r from-brand-teal to-brand-teal-light backdrop-blur-lg py-1 px-3 border-white/20 shadow-md scale-90'
+            : 'max-w-7xl bg-gradient-to-r from-brand-teal to-brand-teal-light backdrop-blur-md py-2 px-5 border-white/20 scale-100'
+        }`}>
+          <div className="flex justify-between items-center w-full">
+            <div className="flex items-center">
+              <img 
+                src="/images/logo-white.svg"
+                alt="OdontoCompany Logo"
+                className={`transition-all duration-500 ${scrolled ? 'h-6.5' : 'h-8.5'} w-auto`}
+              />
+              <span className="ml-2.5 pl-2.5 border-l border-white/40 text-[10px] sm:text-xs font-bold text-white uppercase tracking-wider block">
+                {unit.name}
+              </span>
+            </div>
+
+            <nav className="hidden md:flex space-x-6 text-xs font-bold text-white">
+              <a href="#tratamentos" className="hover:text-brand-lime transition-colors">Tratamentos</a>
+              <a href="#video" className="hover:text-brand-lime transition-colors">Vídeo</a>
+              <a href="#estrutura" className="hover:text-brand-lime transition-colors">Estrutura</a>
+              <a href="#profissionais" className="hover:text-brand-lime transition-colors">Dentistas</a>
+              <a href="#depoimentos" className="hover:text-brand-lime transition-colors">Depoimentos</a>
+              <a href="#faq" className="hover:text-brand-lime transition-colors">Dúvidas</a>
+              <a href="#localizacao" className="hover:text-brand-lime transition-colors">Contato</a>
+            </nav>
+
+            <div>
+              <a 
+                href={`https://api.whatsapp.com/send?phone=${unit.whatsapp}&text=${encodeURIComponent(unit.whatsappMessage)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`inline-flex items-center gap-1.5 rounded-full bg-brand-emerald hover:bg-emerald-600 text-white font-bold tracking-wide shadow-md transition-all hover:scale-105 active:scale-95 ${
+                  scrolled ? 'px-3.5 py-1.5 text-[10px]' : 'px-4.5 py-2 text-xs'
+                }`}
+              >
+                <WhatsAppIcon className={`shrink-0 ${scrolled ? 'w-5 h-5' : 'w-6 h-6'}`} />
+                <span className="whitespace-nowrap">Agendar Avaliação</span>
+              </a>
+            </div>
+          </div>
+
+          {/* Mobile navigation row (scrollable, matches ODC style) */}
+          <nav className="flex md:hidden overflow-x-auto whitespace-nowrap scrollbar-none py-2 mt-2 border-t border-white/20 gap-5 text-[10px] font-bold text-white">
+            <a href="#tratamentos" className="hover:text-brand-lime transition-colors">Tratamentos</a>
+            <a href="#video" className="hover:text-brand-lime transition-colors">Vídeo</a>
+            <a href="#estrutura" className="hover:text-brand-lime transition-colors">Estrutura</a>
+            <a href="#profissionais" className="hover:text-brand-lime transition-colors">Dentistas</a>
+            <a href="#depoimentos" className="hover:text-brand-lime transition-colors">Depoimentos</a>
+            <a href="#faq" className="hover:text-brand-lime transition-colors">Dúvidas</a>
+            <a href="#localizacao" className="hover:text-brand-lime transition-colors">Contato</a>
+          </nav>
+        </header>
+      </div>
+
+      {/* Main Content */}
+      <main className="flex-grow">
+        
+        {/* HERO SECTION */}
+        <section className="relative min-h-[95dvh] flex flex-col justify-between pt-28 overflow-hidden bg-brand-green-primary">
+          {/* Background image: limited to 60vh on mobile to prevent height-based scaling/zoom, covers full screen on desktop */}
+          <div className="absolute inset-x-0 top-0 h-[60vh] md:h-full z-0 overflow-hidden">
+            <img 
+              src={unit.images.heroBg}
+              alt="Fundo"
+              className="w-full h-full object-cover object-right opacity-95 select-none pointer-events-none" 
+            />
+            {/* Mobile gradient to fade the image into the solid green background */}
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-brand-green-primary/40 to-brand-green-primary md:hidden"></div>
+            {/* Subtle 5% black overlay */}
+            <div className="absolute inset-0 bg-black/5"></div>
+          </div>
+
+          {/* Gradient overlay - OdontoCompany ODC green to transparent */}
+          <div className="absolute inset-0 bg-gradient-to-b from-brand-green-primary/20 via-brand-green-primary/10 via-40% to-transparent pointer-events-none z-10 md:bg-gradient-to-r md:from-brand-green-primary/85 md:via-brand-green-primary/65 md:via-35% md:to-transparent md:to-60%"></div>
+
+          <div className="max-w-7xl mx-auto px-5 w-full relative z-20 my-auto py-12 md:py-16">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+              
+              {/* Left Column: Heading and CTAs */}
+              <div className="lg:col-span-7 space-y-6 text-left max-w-2xl">
+
+                {/* Tagline oficial da marca */}
+                <div className="inline-flex items-center gap-3">
+                  <span className="h-px w-8 bg-brand-lime shrink-0"></span>
+                  <span className="text-xs sm:text-sm font-extrabold uppercase tracking-[0.22em] text-brand-lime">
+                    Porque a vida é melhor sorrindo
+                  </span>
+                </div>
+
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white leading-tight">
+                  Sorria de verdade com a <span className="uppercase">OdontoCompany <span className="text-white">{unit.name}</span></span>
+                </h1>
+                
+                <p className="text-base md:text-lg text-slate-200/90 leading-relaxed max-w-[55ch]">
+                  Tratamentos odontológicos modernos e completos com parcelas que cabem perfeitamente no seu bolso. Agende sua avaliação hoje mesmo!
+                </p>
+
+                {/* Hero Form relocated here */}
+                <div className="mt-8 bg-brand-green-primary/40 backdrop-blur-md rounded-2xl p-6 border border-white/10 shadow-xl relative overflow-hidden max-w-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:border-white/20 hover:bg-brand-green-primary/45">
+                  <div className="absolute top-0 left-0 w-full h-1 bg-[#39b54a]"></div>
+                  
+                  <div className="mb-6">
+                    <h3 className="text-lg font-bold text-white">Agende sua avaliação</h3>
+                    <p className="text-xs text-slate-300 mt-1">Preencha o formulário e fale no WhatsApp da Unidade</p>
+                  </div>
+
+                  <form onSubmit={handleFormSubmit} className="space-y-4">
+                    <div className="space-y-1">
+                      <label htmlFor="form-name" className="text-xs font-semibold text-slate-200 block">Nome Completo</label>
+                      <div className="relative">
+                        <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 pointer-events-none">
+                          <User className="w-4 h-4" />
+                        </span>
+                        <input
+                          id="form-name"
+                          type="text"
+                          required
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          placeholder="Seu nome"
+                          className="w-full pl-10 pr-4 py-3 rounded-xl border border-white/15 focus:outline-none focus:ring-2 focus:ring-[#39b54a] focus:border-transparent text-sm bg-white/5 text-white placeholder-slate-400 focus:bg-white/10 transition-all"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <label htmlFor="form-phone" className="text-xs font-semibold text-slate-200 block">WhatsApp com DDD</label>
+                      <div className="relative">
+                        <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 pointer-events-none">
+                          <Phone className="w-4 h-4" />
+                        </span>
+                        <input
+                          id="form-phone"
+                          type="tel"
+                          required
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          placeholder="Ex: 21999999999"
+                          className="w-full pl-10 pr-4 py-3 rounded-xl border border-white/15 focus:outline-none focus:ring-2 focus:ring-[#39b54a] focus:border-transparent text-sm bg-white/5 text-white placeholder-slate-400 focus:bg-white/10 transition-all"
+                        />
+                      </div>
+                      <span className="text-[10px] text-slate-300/80 block">Digite apenas números.</span>
+                    </div>
+
+                    <div className="space-y-1">
+                      <label htmlFor="form-treatment" className="text-xs font-semibold text-slate-200 block">Tratamento de interesse (Opcional)</label>
+                      <div className="relative">
+                        <select
+                          id="form-treatment"
+                          value={treatment}
+                          onChange={(e) => setTreatment(e.target.value)}
+                          className="w-full px-4 py-3 rounded-xl border border-white/15 focus:outline-none focus:ring-2 focus:ring-[#39b54a] focus:border-transparent text-sm bg-brand-green-deep text-white focus:bg-brand-green-primary transition-all appearance-none cursor-pointer"
+                        >
+                          <option value="" className="text-slate-900 bg-white">Selecione um tratamento...</option>
+                          {unit.treatments.map((t) => (
+                            <option key={t.id} value={t.title} className="text-slate-900 bg-white">{t.title}</option>
+                          ))}
+                        </select>
+                        <span className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-300 pointer-events-none">
+                          <CaretDown className="w-4 h-4" />
+                        </span>
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={formSubmitted}
+                      className="w-full py-4 px-6 rounded-xl bg-[#39b54a] hover:bg-[#2fa33e] text-white font-extrabold text-base shadow-md shadow-[#39b54a]/10 transition-all active:scale-[0.98] disabled:opacity-75 flex items-center justify-center gap-2 cursor-pointer mt-6"
+                    >
+                      {formSubmitted ? (
+                        <>
+                          <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/20 border-t-white"></div>
+                          <span>Redirecionando...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Iniciar Agendamento</span>
+                          <CaretRight className="w-5 h-5" />
+                        </>
+                      )}
+                    </button>
+                  </form>
+
+                  <div className="mt-4 text-center">
+                    <p className="text-[10px] text-slate-300/60">
+                      🔒 Seus dados estão seguros e protegidos em conformidade com a LGPD.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Key Benefits as Pill Cards, aligned to the bottom */}
+              <div className="lg:col-span-5 flex flex-col justify-end gap-3.5 self-stretch lg:pb-2 pt-8 lg:pt-0">
+                <div className="bg-brand-green-primary/30 backdrop-blur-md border border-white/10 rounded-full px-6 py-4 flex items-center gap-3.5 hover:bg-brand-green-primary/45 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl w-full lg:w-[460px] lg:ml-auto shrink-0">
+                  <CheckCircle className="w-5.5 h-5.5 text-brand-lime shrink-0" />
+                  <span className="text-white text-sm sm:text-base font-semibold tracking-wide">Todas as especialidades médicas</span>
+                </div>
+                <div className="bg-brand-green-primary/30 backdrop-blur-md border border-white/10 rounded-full px-6 py-4 flex items-center gap-3.5 hover:bg-brand-green-primary/45 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl w-full lg:w-[460px] lg:ml-auto shrink-0">
+                  <CheckCircle className="w-5.5 h-5.5 text-brand-lime shrink-0" />
+                  <span className="text-white text-sm sm:text-base font-semibold tracking-wide">Equipamentos de alta tecnologia</span>
+                </div>
+                <div className="bg-brand-green-primary/30 backdrop-blur-md border border-white/10 rounded-full px-6 py-4 flex items-center gap-3.5 hover:bg-brand-green-primary/45 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl w-full lg:w-[460px] lg:ml-auto shrink-0">
+                  <CheckCircle className="w-5.5 h-5.5 text-brand-lime shrink-0" />
+                  <span className="text-white text-sm sm:text-base font-semibold tracking-wide">Atendimento rápido e humanizado</span>
+                </div>
+                <div className="bg-brand-green-primary/30 backdrop-blur-md border border-white/10 rounded-full px-6 py-4 flex items-center gap-3.5 hover:bg-brand-green-primary/45 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl w-full lg:w-[460px] lg:ml-auto shrink-0">
+                  <CheckCircle className="w-5.5 h-5.5 text-brand-lime shrink-0" />
+                  <span className="text-white text-sm sm:text-base font-semibold tracking-wide">Pagamento facilitado no carnê</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* HERO TRUST MARQUEE FOOTER */}
+          <div className="w-full relative z-10 bg-brand-green-dark/45 backdrop-blur-md border-t border-white/10 py-3.5 mt-auto overflow-hidden">
+            <div className="relative w-full overflow-hidden flex">
+              <div className="animate-marquee flex gap-16 items-center whitespace-nowrap text-white/80 pr-16">
+                <span className="text-xs md:text-sm font-bold tracking-wider flex items-center gap-2">
+                  <ShieldCheck className="w-4.5 h-4.5 text-brand-lime" /> CFO - REGULAMENTADO
+                </span>
+                <span className="text-xs md:text-sm font-bold tracking-wider flex items-center gap-2">
+                  <CheckCircle className="w-4.5 h-4.5 text-brand-lime" /> SELO EXCELÊNCIA ABF
+                </span>
+                <span className="text-xs md:text-sm font-bold tracking-wider flex items-center gap-2">
+                  <Star weight="fill" className="w-4.5 h-4.5 text-yellow-400" /> AVALIAÇÃO GOOGLE 4.9/5
+                </span>
+                <span className="text-xs md:text-sm font-bold tracking-wider flex items-center gap-2">
+                  <CheckCircle className="w-4.5 h-4.5 text-brand-lime" /> +25 MILHÕES DE SORRISOS
+                </span>
+
+                {/* Duplicated for seamless loop */}
+                <span className="text-xs md:text-sm font-bold tracking-wider flex items-center gap-2">
+                  <ShieldCheck className="w-4.5 h-4.5 text-brand-lime" /> CFO - REGULAMENTADO
+                </span>
+                <span className="text-xs md:text-sm font-bold tracking-wider flex items-center gap-2">
+                  <CheckCircle className="w-4.5 h-4.5 text-brand-lime" /> SELO EXCELÊNCIA ABF
+                </span>
+                <span className="text-xs md:text-sm font-bold tracking-wider flex items-center gap-2">
+                  <Star weight="fill" className="w-4.5 h-4.5 text-yellow-400" /> AVALIAÇÃO GOOGLE 4.9/5
+                </span>
+                <span className="text-xs md:text-sm font-bold tracking-wider flex items-center gap-2">
+                  <CheckCircle className="w-4.5 h-4.5 text-brand-lime" /> +25 MILHÕES DE SORRISOS
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* TREATMENTS SECTION */}
+        <section id="tratamentos" className="py-20 bg-slate-50 relative overflow-hidden">
+          {/* Custom premium background texture image - fixed parallax */}
+          <div className="absolute inset-0 opacity-40 mix-blend-multiply pointer-events-none select-none z-0 bg-[url('/images/bg-texture.jpg')] bg-cover bg-center bg-fixed"></div>
+
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+            <div className="max-w-3xl mx-auto space-y-4 mb-16 flex flex-col items-center text-center">
+              <div className="flex flex-col items-center">
+                <h2 className="text-3xl md:text-5xl font-extrabold text-brand-green-primary tracking-tight">
+                  Especialidades Odontológicas
+                </h2>
+                {/* Modern premium visual highlight divider */}
+                <div className="flex items-center gap-2 mt-4">
+                  <span className="h-[2px] w-16 bg-gradient-to-r from-transparent to-brand-green-primary rounded-full"></span>
+                  <span className="h-2.5 w-2.5 rotate-45 bg-brand-green-primary"></span>
+                  <span className="h-[2px] w-16 bg-gradient-to-l from-transparent to-brand-green-primary rounded-full"></span>
+                </div>
+              </div>
+
+              <h3 className="text-xl md:text-2xl font-bold text-brand-emerald">
+                Tratamentos completos para você e sua família
+              </h3>
+
+              <p className="text-brand-emerald text-lg md:text-xl max-w-2xl mx-auto text-center font-medium">
+                Dispomos de profissionais qualificados em todas as áreas da odontologia moderna para atender a qualquer necessidade.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {unit.treatments.map((t) => (
+                <div 
+                  key={t.id}
+                  className="bg-white rounded-2xl border border-neutral-border hover:shadow-lg transition-all duration-300 hover:-translate-y-1 text-left flex flex-col overflow-hidden"
+                >
+                  {t.imageUrl ? (
+                    <div className="w-full h-48 bg-slate-100 overflow-hidden relative">
+                      <img src={t.imageUrl} alt={t.title} className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
+                    </div>
+                  ) : (
+                    <div className="p-6 pb-0">
+                      <div className="w-12 h-12 rounded-xl bg-brand-green-light flex items-center justify-center">
+                        {renderIcon(t.iconName)}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="p-6 flex flex-col flex-1">
+                    <div className="space-y-2">
+                      <h3 className="text-lg font-bold text-brand-emerald">{t.title}</h3>
+                      <p className="text-sm text-brand-emerald leading-relaxed">
+                        {t.description}
+                      </p>
+                    </div>
+                    <div className="pt-6 mt-auto">
+                      <a 
+                        href={`https://api.whatsapp.com/send?phone=${unit.whatsapp}&text=${encodeURIComponent(`Olá! Gostaria de saber mais sobre o tratamento de ${t.title} na unidade ${unit.name}.`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-emerald hover:text-emerald-700 transition-colors uppercase tracking-wider"
+                      >
+                        <span>Saber mais</span>
+                        <CaretRight className="w-3.5 h-3.5" />
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* CTA Button for other treatments */}
+            <div className="mt-12 flex justify-center relative z-10">
+              <a 
+                href={`https://api.whatsapp.com/send?phone=${unit.whatsapp}&text=${encodeURIComponent(`Olá! Gostaria de tirar dúvidas sobre outros tratamentos na unidade ${unit.name}.`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-brand-emerald hover:bg-emerald-600 text-white font-bold text-sm tracking-wide shadow-md transition-all hover:scale-105 active:scale-95"
+              >
+                <WhatsAppIcon className="w-6.5 h-6.5 shrink-0" />
+                <span>Consultar outros tratamentos</span>
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* VIDEO SECTION */}
+        <section id="video" className="py-20 bg-slate-50 relative overflow-hidden">
+          {/* Custom premium background texture image - fixed parallax */}
+          <div className="absolute inset-0 opacity-40 mix-blend-multiply pointer-events-none select-none z-0 bg-[url('/images/bg-texture.jpg')] bg-cover bg-center bg-fixed"></div>
+
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+            
+            {/* Header matching standard style */}
+            <div className="max-w-3xl mx-auto space-y-4 mb-12 flex flex-col items-center text-center">
+              <div className="flex flex-col items-center">
+                <h2 className="text-3xl md:text-5xl font-extrabold text-brand-green-primary tracking-tight">
+                  A marca que você conhece e confia na TV aberta
+                </h2>
+                {/* Modern premium visual highlight divider */}
+                <div className="flex items-center gap-2 mt-4">
+                  <span className="h-[2px] w-16 bg-gradient-to-r from-transparent to-brand-green-primary rounded-full"></span>
+                  <span className="h-2.5 w-2.5 rotate-45 bg-brand-green-primary"></span>
+                  <span className="h-[2px] w-16 bg-gradient-to-l from-transparent to-brand-green-primary rounded-full"></span>
+                </div>
+              </div>
+              <p className="text-brand-emerald text-lg md:text-xl max-w-3xl">
+                Com presença diária nos maiores canais do país, trazemos a segurança e a credibilidade da maior rede de clínicas odontológicas do mundo diretamente para cuidar do seu sorriso.
+              </p>
+            </div>
+
+            {/* Single Centered Video Player */}
+            <div className="max-w-4xl mx-auto px-4">
+              <div className="aspect-video w-full rounded-2xl overflow-hidden shadow-2xl border border-neutral-border bg-slate-900">
+                <iframe 
+                  src="https://www.youtube.com/embed/hLGCSvZ6bBQ" 
+                  title="Campanha Nacional OdontoCompany" 
+                  className="w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              </div>
+              <p className="text-xs text-neutral-muted mt-4 italic font-medium">
+                Campanha de Destaque Nacional OdontoCompany
+              </p>
+            </div>
+
+          </div>
+        </section>
+
+        {/* CLINIC STRUCTURE GALLERY */}
+        <section id="estrutura" className="py-20 bg-brand-odc">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div className="max-w-3xl mx-auto space-y-4 mb-16 flex flex-col items-center text-center">
+              <div className="flex flex-col items-center">
+                <h2 className="text-3xl md:text-5xl font-extrabold text-white tracking-tight">
+                  Estrutura moderna planejada para o seu bem-estar
+                </h2>
+                {/* Modern premium visual highlight divider */}
+                <div className="flex items-center gap-2 mt-4">
+                  <span className="h-[2px] w-16 bg-gradient-to-r from-transparent to-white rounded-full"></span>
+                  <span className="h-2.5 w-2.5 rotate-45 bg-white"></span>
+                  <span className="h-[2px] w-16 bg-gradient-to-l from-transparent to-white rounded-full"></span>
+                </div>
+              </div>
+              <p className="text-white/80 text-lg md:text-xl max-w-3xl">
+                Ambientes climatizados, salas esterilizadas e equipamentos de ponta para garantir a segurança e o conforto do seu atendimento.
+              </p>
+            </div>
+
+            {/* Asymmetric Bento-like gallery layout */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="md:col-span-2 relative h-80 rounded-3xl overflow-hidden group shadow-md">
+                <img 
+                  src={unit.images.reception} 
+                  alt="Recepção confortável da OdontoCompany" 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-6">
+                  <div className="text-left text-white">
+                    <span className="text-xs font-bold uppercase tracking-wider text-brand-lime">Conforto</span>
+                    <h4 className="text-lg font-bold">Recepção Acolhedora</h4>
+                  </div>
+                </div>
+              </div>
+              <div className="relative h-80 rounded-3xl overflow-hidden group shadow-md">
+                <img 
+                  src={unit.images.consulting} 
+                  alt="Consultório equipado" 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-6">
+                  <div className="text-left text-white">
+                    <span className="text-xs font-bold uppercase tracking-wider text-brand-lime">Tecnologia</span>
+                    <h4 className="text-lg font-bold">Consultórios Completos</h4>
+                  </div>
+                </div>
+              </div>
+              <div className="relative h-80 rounded-3xl overflow-hidden group shadow-md">
+                <img 
+                  src={unit.images.facade} 
+                  alt="Fachada da clínica local" 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-6">
+                  <div className="text-left text-white">
+                    <span className="text-xs font-bold uppercase tracking-wider text-brand-lime">Localização</span>
+                    <h4 className="text-lg font-bold">Fácil Acesso</h4>
+                  </div>
+                </div>
+              </div>
+              <div className="md:col-span-2 relative h-80 rounded-3xl overflow-hidden group shadow-md">
+                <img 
+                  src="/images/estrutura/biosseguranca.webp" 
+                  alt="Equipamento de esterilização e biossegurança" 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-6">
+                  <div className="text-left text-white">
+                    <span className="text-xs font-bold uppercase tracking-wider text-brand-lime">Cuidado</span>
+                    <h4 className="text-lg font-bold">Biossegurança Rigorosa</h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* DENTISTS SECTION */}
+        <section id="profissionais" className="py-20 bg-neutral-base">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div className="max-w-3xl mx-auto space-y-4 mb-16 flex flex-col items-center text-center">
+              <div className="flex flex-col items-center">
+                <h2 className="text-3xl md:text-5xl font-extrabold text-brand-green-primary tracking-tight">
+                  Nossos Especialistas
+                </h2>
+                {/* Modern premium visual highlight divider */}
+                <div className="flex items-center gap-2 mt-4">
+                  <span className="h-[2px] w-16 bg-gradient-to-r from-transparent to-brand-green-primary rounded-full"></span>
+                  <span className="h-2.5 w-2.5 rotate-45 bg-brand-green-primary"></span>
+                  <span className="h-[2px] w-16 bg-gradient-to-l from-transparent to-brand-green-primary rounded-full"></span>
+                </div>
+              </div>
+              <p className="text-brand-emerald text-lg md:text-xl">
+                Conheça os profissionais dedicados a cuidar da saúde e beleza do seu sorriso na unidade {unit.name}.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-8">
+              {unit.dentists.map((dentist, i) => (
+                <div 
+                  key={i}
+                  className="bg-white rounded-2xl overflow-hidden border border-neutral-border shadow-sm max-w-sm w-full sm:w-[320px] transition-all hover:shadow-md"
+                >
+                  <div className="h-64 overflow-hidden relative bg-slate-100">
+                    <img 
+                      src={dentist.photoUrl} 
+                      alt={dentist.name} 
+                      className="w-full h-full object-cover object-top"
+                    />
+                  </div>
+                  <div className="p-6 text-left space-y-2">
+                    <h3 className="text-lg font-bold text-brand-odc">{dentist.name}</h3>
+                    <p className="text-xs font-semibold text-brand-emerald uppercase tracking-wider">{dentist.specialty}</p>
+                    <p className="text-[11px] text-brand-emerald">{dentist.cro}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* TESTIMONIALS SECTION */}
+        <section id="depoimentos" className="py-20 bg-neutral-base">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div className="max-w-3xl mx-auto space-y-4 mb-16 flex flex-col items-center text-center">
+              <div className="flex flex-col items-center">
+                <h2 className="text-3xl md:text-5xl font-extrabold text-brand-green-primary tracking-tight">
+                  O que dizem nossos pacientes
+                </h2>
+                {/* Modern premium visual highlight divider */}
+                <div className="flex items-center gap-2 mt-4">
+                  <span className="h-[2px] w-16 bg-gradient-to-r from-transparent to-brand-green-primary rounded-full"></span>
+                  <span className="h-2.5 w-2.5 rotate-45 bg-brand-green-primary"></span>
+                  <span className="h-[2px] w-16 bg-gradient-to-l from-transparent to-brand-green-primary rounded-full"></span>
+                </div>
+              </div>
+              <p className="text-brand-emerald text-lg md:text-xl">
+                A satisfação de quem confiou o sorriso à <strong className="uppercase font-extrabold">OdontoCompany {unit.name}</strong>.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {unit.testimonials.map((t, i) => (
+                <div 
+                  key={i}
+                  className="bg-slate-50 rounded-2xl p-6 border border-neutral-border text-left flex flex-col justify-between"
+                >
+                  <div className="space-y-4">
+                    <div className="flex text-yellow-500">
+                      {[...Array(t.rating)].map((_, index) => (
+                        <Star key={index} weight="fill" className="w-4.5 h-4.5" />
+                      ))}
+                    </div>
+                    <p className="text-sm text-slate-700 italic leading-relaxed">
+                      "{t.text}"
+                    </p>
+                  </div>
+                  <div className="pt-6 border-t border-slate-200 mt-6 flex justify-between items-center">
+                    <div>
+                      <h4 className="text-sm font-bold text-brand-green-deep">{t.name}</h4>
+                      <p className="text-[11px] text-neutral-muted">Paciente da Unidade</p>
+                    </div>
+                    <span className="text-[11px] font-semibold bg-brand-green-light text-brand-green-primary px-2.5 py-0.5 rounded-full">
+                      {t.treatment}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ SECTION */}
+        <section id="faq" className="py-20 bg-white">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div className="space-y-4 mb-16 flex flex-col items-center text-center">
+              <div className="flex flex-col items-center">
+                <h2 className="text-3xl md:text-5xl font-extrabold text-brand-green-primary tracking-tight">
+                  Dúvidas comuns de nossos pacientes
+                </h2>
+                {/* Modern premium visual highlight divider */}
+                <div className="flex items-center gap-2 mt-4">
+                  <span className="h-[2px] w-16 bg-gradient-to-r from-transparent to-brand-green-primary rounded-full"></span>
+                  <span className="h-2.5 w-2.5 rotate-45 bg-brand-green-primary"></span>
+                  <span className="h-[2px] w-16 bg-gradient-to-l from-transparent to-brand-green-primary rounded-full"></span>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 text-left items-start">
+              {/* Left Column (First 2 questions) */}
+              <div className="space-y-4">
+                {faqs.slice(0, 2).map((faq, i) => {
+                  const actualIndex = i;
+                  const isOpen = openFaqs.includes(actualIndex);
+                  return (
+                    <div 
+                      key={actualIndex}
+                      className="bg-slate-50 border border-neutral-border rounded-xl overflow-hidden transition-all duration-300 hover:shadow-sm"
+                    >
+                      <button
+                        onClick={() => setOpenFaqs(prev => isOpen ? prev.filter(x => x !== actualIndex) : [...prev, actualIndex])}
+                        className="w-full px-6 py-5 flex justify-between items-center text-left hover:bg-slate-100/50 transition-colors font-bold text-brand-odc text-sm md:text-base"
+                      >
+                        <span>{faq.q}</span>
+                        <CaretDown className={`w-5 h-5 text-brand-emerald transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+                      </button>
+                      
+                      {isOpen && (
+                        <div className="px-6 pb-5 text-sm text-brand-emerald leading-relaxed border-t border-slate-200/60 pt-4 bg-white">
+                          {faq.a}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Right Column (Last 2 questions) */}
+              <div className="space-y-4">
+                {faqs.slice(2, 4).map((faq, i) => {
+                  const actualIndex = i + 2;
+                  const isOpen = openFaqs.includes(actualIndex);
+                  return (
+                    <div 
+                      key={actualIndex}
+                      className="bg-slate-50 border border-neutral-border rounded-xl overflow-hidden transition-all duration-300 hover:shadow-sm"
+                    >
+                      <button
+                        onClick={() => setOpenFaqs(prev => isOpen ? prev.filter(x => x !== actualIndex) : [...prev, actualIndex])}
+                        className="w-full px-6 py-5 flex justify-between items-center text-left hover:bg-slate-100/50 transition-colors font-bold text-brand-odc text-sm md:text-base"
+                      >
+                        <span>{faq.q}</span>
+                        <CaretDown className={`w-5 h-5 text-brand-emerald transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+                      </button>
+                      
+                      {isOpen && (
+                        <div className="px-6 pb-5 text-sm text-brand-emerald leading-relaxed border-t border-slate-200/60 pt-4 bg-white">
+                          {faq.a}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* COMBINED BOOKING SECTION & FOOTER */}
+        <div className="relative bg-slate-950 overflow-hidden">
+          {/* Background facade image that scrolls naturally with page (no stretching or rendering bugs) */}
+          <div className="absolute inset-0 z-0">
+            <img 
+              src={footerBg} 
+              alt="Fachada Clínica OdontoCompany" 
+              className="w-full h-full object-cover opacity-55 select-none pointer-events-none" 
+            />
+            {/* Gradient overlay with 20% opacity at the top, 40% in the middle, and dark green at the bottom */}
+            <div className="absolute inset-0 bg-gradient-to-b from-brand-green-dark/20 via-brand-green-dark/40 to-brand-green-dark"></div>
+          </div>
+
+          {/* Booking Form (formerly localizacao) */}
+          <section id="localizacao" className="relative py-20 z-10 border-b border-white/5">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                
+                {/* Left Column: Form Invite Placeholder Text */}
+                <div className="lg:col-span-6 flex flex-col items-center lg:items-start text-center lg:text-left text-white space-y-6">
+                  <div className="space-y-4">
+                    <h2 className="text-3xl md:text-5xl font-extrabold text-white tracking-tight leading-tight">
+                      Pronto para transformar o seu sorriso?
+                    </h2>
+                    <p className="text-slate-200 text-base md:text-lg font-medium leading-relaxed max-w-[55ch]">
+                      Use o formulário ao lado para iniciar a reserva da sua avaliação gratuita na OdontoCompany {unit.name}. Escolha o tratamento desejado e preencha seus dados para garantirmos o melhor horário para o seu atendimento.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Right Column: Glassmorphic Booking Form Card */}
+                <div className="lg:col-span-6 bg-slate-950/50 border border-white/10 backdrop-blur-md rounded-3xl p-8 text-white flex flex-col justify-between shadow-2xl min-h-[480px]">
+                  
+                  <div className="flex justify-between items-center pb-4 border-b border-white/10 mb-6">
+                    <span className="text-[10px] font-black tracking-wider text-brand-lime uppercase bg-brand-green-primary/30 px-3 py-1 rounded-full">
+                      {footerFormStep === 3 ? 'Concluído' : `Passo ${footerFormStep} de 2`}
+                    </span>
+                    <span className="text-xs text-slate-400">Pré-Agendamento Rápido</span>
+                  </div>
+
+                  {footerFormStep === 1 && (
+                    <div className="flex-1 flex flex-col justify-between min-h-[380px]">
+                      <div>
+                        <h3 className="text-xl md:text-2xl font-extrabold text-white tracking-tight mb-2">
+                          Qual é o seu objetivo?
+                        </h3>
+                        <p className="text-slate-300 text-xs md:text-sm leading-relaxed">
+                          Selecione o procedimento que deseja realizar para podermos direcionar você ao especialista certo.
+                        </p>
+
+                        <div className="grid grid-cols-2 gap-3 mt-6">
+                          {unit.treatments.map((t) => (
+                            <button
+                              key={t.id}
+                              type="button"
+                              onClick={() => setFooterTreatment(t.title)}
+                              className={`px-4 py-3.5 rounded-xl border text-xs font-bold text-center transition-all duration-200 cursor-pointer ${
+                                footerTreatment === t.title
+                                  ? 'bg-brand-emerald border-transparent text-white shadow-lg scale-[1.03]'
+                                  : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10'
+                              }`}
+                            >
+                              {t.title}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="mt-8 flex justify-end pt-4">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.currentTarget.blur();
+                            setFooterFormStep(2);
+                          }}
+                          className="px-6 py-3.5 bg-brand-emerald hover:bg-emerald-600 font-bold rounded-xl text-xs uppercase tracking-wider flex items-center gap-1.5 transition-all hover:scale-105 active:scale-95 text-white cursor-pointer"
+                        >
+                          Próximo <CaretRight className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {footerFormStep === 2 && (
+                    <div className="flex-1 flex flex-col justify-between min-h-[380px]">
+                      <form onSubmit={handleFooterFormSubmit} className="flex-1 flex flex-col justify-between">
+                        <div>
+                          <h3 className="text-xl md:text-2xl font-extrabold text-white tracking-tight mb-2">
+                            Para quem enviamos o agendamento?
+                          </h3>
+                          <p className="text-slate-300 text-xs md:text-sm leading-relaxed mb-6">
+                            Informe seu nome e WhatsApp para nossa equipe entrar em contato para confirmar sua avaliação.
+                          </p>
+
+                          <div className="space-y-4">
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-semibold text-slate-300 block">Nome Completo</label>
+                              <div className="relative">
+                                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 pointer-events-none">
+                                  <User className="w-4 h-4" />
+                                </span>
+                                <input
+                                  type="text"
+                                  required
+                                  placeholder="Seu nome completo"
+                                  value={footerName}
+                                  onChange={(e) => setFooterName(e.target.value)}
+                                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-white/15 focus:outline-none focus:ring-2 focus:ring-[#39b54a] focus:border-transparent text-sm bg-white/5 text-white placeholder-slate-400 focus:bg-white/10 transition-all"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-semibold text-slate-300 block">WhatsApp com DDD</label>
+                              <div className="relative">
+                                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 pointer-events-none">
+                                  <Phone className="w-4 h-4" />
+                                </span>
+                                <input
+                                  type="tel"
+                                  required
+                                  placeholder="(00) 00000-0000"
+                                  value={footerPhone}
+                                  onChange={(e) => setFooterPhone(e.target.value)}
+                                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-white/15 focus:outline-none focus:ring-2 focus:ring-[#39b54a] focus:border-transparent text-sm bg-white/5 text-white placeholder-slate-400 focus:bg-white/10 transition-all"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="mt-8 flex justify-between gap-4 pt-4 border-t border-white/5">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.currentTarget.blur();
+                              setFooterFormStep(1);
+                            }}
+                            className="px-6 py-3 bg-white/5 hover:bg-white/10 font-bold rounded-xl text-xs uppercase tracking-wider text-slate-300 transition-all cursor-pointer"
+                          >
+                            Voltar
+                          </button>
+                          <button
+                            type="submit"
+                            className="px-6 py-3.5 bg-brand-emerald hover:bg-emerald-600 font-bold rounded-xl text-xs uppercase tracking-wider flex items-center gap-1.5 transition-all hover:scale-105 active:scale-95 text-white cursor-pointer"
+                          >
+                            Finalizar <CheckCircle className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  )}
+
+                  {footerFormStep === 3 && (
+                    <div className="flex-grow flex flex-col justify-center items-center text-center py-6 min-h-[380px]">
+                      <div className="w-16 h-16 rounded-full bg-brand-emerald/20 flex items-center justify-center mb-6 border border-brand-emerald/30 animate-bounce">
+                        <Sparkle className="w-8 h-8 text-brand-lime" />
+                      </div>
+                      <h3 className="text-xl md:text-2xl font-extrabold text-white tracking-tight mb-3">
+                        Solicitação Enviada!
+                      </h3>
+                      <p className="text-slate-300 text-sm leading-relaxed max-w-sm mb-6">
+                        Sua pré-reserva para <strong>{footerTreatment}</strong> foi concluída. Clique no botão abaixo para abrir a conversa no WhatsApp e falar direto com a nossa recepção agora mesmo.
+                      </p>
+
+                      <div className="w-full max-w-sm space-y-3">
+                        <a
+                          href={`https://api.whatsapp.com/send?phone=${unit.whatsapp}&text=${encodeURIComponent(`Olá! Meu nome é ${footerName}. Solicitei um agendamento para ${footerTreatment} na unidade ${unit.name} e gostaria de confirmar meu horário.`)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full inline-flex justify-center items-center gap-2 px-6 py-4 rounded-xl bg-brand-emerald hover:bg-emerald-600 text-white font-bold text-sm tracking-wide shadow-md transition-all hover:scale-105 active:scale-95"
+                        >
+                          <WhatsAppIcon className="w-6 h-6 shrink-0" />
+                          <span>Chamar no WhatsApp</span>
+                        </a>
+                        
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setFooterFormStep(1);
+                            setFooterName('');
+                            setFooterPhone('');
+                          }}
+                          className="text-xs text-slate-400 hover:text-white transition-colors underline cursor-pointer"
+                        >
+                          Fazer outro agendamento
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Footer (Rodapé) */}
+          <footer className="relative py-16 z-10">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+              <div className="flex flex-col md:flex-row justify-between items-center md:items-end gap-8 border-b border-white/10 pb-8">
+                
+                <div className="space-y-4 text-center md:text-left w-full md:w-auto">
+                  <a 
+                    href="https://www.op7franchising.com" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-block transition-transform hover:scale-[1.03] active:scale-[0.98]"
+                  >
+                    <img 
+                      src={logoFooter} 
+                      alt="OP7 Franchising Logo" 
+                      className="h-[94px] w-auto object-contain opacity-95 mx-auto md:mx-0"
+                    />
+                  </a>
+                </div>
+
+                <div className="flex flex-col md:flex-row items-center md:items-end gap-6 text-center md:text-right">
+                  <div className="text-[10px] uppercase tracking-wider text-white/70 space-y-1 font-medium text-center md:text-right">
+                    <p className="font-bold text-white">OdontoCompany {unit.name} - CNPJ</p>
+                    <p className="font-mono">{unit.cnpj}</p>
+                    <p>{unit.address.street}, {unit.address.number} - {unit.address.neighborhood}</p>
+                    <p>{unit.address.city} - {unit.address.state}, CEP {unit.address.zipCode}</p>
+                    <p className="normal-case text-white/50 mt-1.5">
+                      Dir. Clínico: {unit.clinicalDirector.name} | Reg. {unit.clinicalDirector.cro}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-[10px] text-white/40">
+                <p>© {new Date().getFullYear()} OdontoCompany {unit.name}. Todos os direitos reservados.</p>
+                <div className="flex gap-4">
+                  <a href="#tratamentos" className="hover:text-brand-lime transition-colors">Tratamentos</a>
+                  <span>·</span>
+                  <a href="#estrutura" className="hover:text-brand-lime transition-colors">Estrutura</a>
+                  <span>·</span>
+                  <a href="#profissionais" className="hover:text-brand-lime transition-colors">Dentistas</a>
+                  <span>·</span>
+                  <a href="/politica-de-privacidade" className="hover:text-white transition-colors">Política de Privacidade</a>
+                  <span>·</span>
+                  <a href="/termos-de-uso" className="hover:text-white transition-colors">Termos de Uso</a>
+                </div>
+              </div>
+            </div>
+          </footer>
+        </div>
+
+      </main>
+
+      {/* Floating WhatsApp Button */}
+      <a 
+        href={`https://api.whatsapp.com/send?phone=${unit.whatsapp}&text=${encodeURIComponent(unit.whatsappMessage)}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 rounded-full bg-[#25D366] text-white shadow-2xl hover:bg-[#22c35e] transition-all hover:scale-110 active:scale-95 group focus:outline-none focus:ring-4 focus:ring-green-300/40"
+        aria-label="Fale conosco no WhatsApp"
+      >
+        {/* Pulsating background ring */}
+        <span className="absolute inset-0 rounded-full bg-[#25D366] opacity-35 animate-ping pointer-events-none"></span>
+        <WhatsAppIcon className="w-8 h-8 relative z-10" />
+      </a>
+
+    </div>
+  );
+}
